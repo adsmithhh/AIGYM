@@ -2,17 +2,27 @@
 on: [push, pull_request]
 jobs:
   test:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.10"]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: "3.10" }
-      - run: python -m pip install -U pip
-      - run: python -m pip install -e .
-      - run: |
-          aigym validate examples/manifest/minimal.yaml
-          aigym compare  examples/manifest/minimal.yaml examples/manifest/transformer.yaml
-          aigym calibrate --baseline configs/apm/baseline.yaml \
-            --left examples/manifest/minimal.yaml \
-            --right examples/manifest/transformer.yaml \
-            --out runs/calibration.json
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Upgrade pip
+        run: python -m pip install -U pip
+      - name: Install package (editable)
+        run: python -m pip install -e .
+      - name: CLI smoke — validate
+        run: aigym validate examples/manifest/minimal.yaml
+      - name: CLI smoke — compare
+        run: aigym compare examples/manifest/minimal.yaml examples/manifest/transformer.yaml
+      - name: CLI smoke — calibrate
+        run: aigym calibrate --baseline configs/apm/baseline.yaml --left examples/manifest/minimal.yaml --right examples/manifest/transformer.yaml --out runs/calibration.json
+      - name: Install test deps
+        run: python -m pip install pytest
+      - name: Pytest
+        run: pytest -q
