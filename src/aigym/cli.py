@@ -1,3 +1,4 @@
+
 ﻿import json, sys, argparse, glob
 from .validate import validate_manifest
 from .compare import compare_manifests
