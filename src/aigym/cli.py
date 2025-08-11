@@ -49,15 +49,15 @@ def main():
 
     if args.cmd == "calibrate":
     report = calibrate_pair(args.baseline, args.left, args.right)
-    if args.out:
-        from pathlib import Path
-        Path(args.out).parent.mkdir(parents=True, exist_ok=True)  # <-- ensure dir exists
-        with open(args.out, "w", encoding="utf-8") as f:
-            json.dump(report, f, indent=2)
-    print(json.dumps(report, indent=2))
-    if args.sqlite:
-        dbmod.insert_calibration_report(args.sqlite, report)
-    return
+        if args.out:
+            from pathlib import Path
+            Path(args.out).parent.mkdir(parents=True, exist_ok=True)
+            with open(args.out, "w", encoding="utf-8") as f:
+                json.dump(report, f, indent=2)
+        print(json.dumps(report, indent=2))
+        if args.sqlite:
+            dbmod.insert_calibration_report(args.sqlite, report)
+        return
 
     if args.cmd == "ingest":
         paths = []
