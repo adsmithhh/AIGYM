@@ -1,0 +1,8 @@
+﻿# venv & caches
+.venv/
+__pycache__/
+*.pyc
+
+# outputs
+runs/
+aigym.db
