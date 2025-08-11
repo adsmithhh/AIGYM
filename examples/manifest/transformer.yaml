@@ -2,8 +2,7 @@ agent:
   id: "agent.transformer.v1"
   name: "TransformerAgent"
   capabilities: ["nlp"]
-  needs:
-    compute: "cpu"
+  needs: { compute: "cpu" }
   handshake:
     protocol: "aigym/1.0"
     intents: ["cooperate", "compare_adapters"]
@@ -17,6 +16,6 @@ adapters:
   transformer_v1:
     type: "transformer"
     params:
-      model: "gpt2"       # placeholder; change to any local/remote model id you use
+      model: "gpt2"
       device: "cpu"
       max_tokens: 64

@@ -1,22 +1,18 @@
-﻿aigym_version: "0.1.0"
-model:
-  id: example/minimal-encoder
-  family: demo
-  arch: encoder
-  dtype: float16
-  parameters: 50_000_000
-io:
-  modalities: [text]
-  vocab: { size: 32000 }
+﻿agent:
+  id: "agent.minimal.v1"
+  name: "MinimalAgent"
+  capabilities: []
+  needs: {}
+  handshake:
+    protocol: "aigym/1.0"
+    intents: ["cooperate"]
+
+tasks:
+  - id: "task.echo"
+    description: "Minimal echo"
+    adapter: "echo_v1"
+
 adapters:
-  - type: LoRA
-    scope: [attention.q, attention.v]
-    rank: 8
-capabilities:
-  tasks:
-    - name: classification
-      metric: accuracy
-      nominal_score: 0.70
-interop:
-  weights:
-    exposure: summary
+  echo_v1:
+    type: "echo"
+    params: { prefix: "[MIN]" }
