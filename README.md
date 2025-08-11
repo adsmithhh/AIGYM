@@ -11,6 +11,15 @@ AIGYM is an **open handshake & interoperability protocol** for **AI ↔ AI** int
 - **Validation CLI**: check structure/semantics.
 - **Comparison**: tasks/adapters overlap.
 - **APM calibration**: anti-saturation priority scaling before cooperation.
+  
+![CI](https://github.com/adsmithhh/AIGYM/actions/workflows/ci.yml/badge.svg)
+
+### Quick Start
+```bash
+pip install -e .
+pip install pyyaml
+aigym validate examples/agent_min.yaml
+aigym demo examples/agent_min.yaml
 
 ## Quick Start
 ```powershell
