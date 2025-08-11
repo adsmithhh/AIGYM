@@ -1,18 +1,21 @@
 agent:
-  id: "agent.minimal.v1"
-  name: "MinimalAgent"
-  capabilities: []
-  needs: {}
+  id: "agent.demo.v1"
+  name: "DemoAgent"
+  capabilities: [chat, tools]
+  needs:
+    compute: "cpu"
+    memory_mb: 1024
+    io: ["stdin","stdout"]
   handshake:
     protocol: "aigym/1.0"
-    intents: ["cooperate"]
+    intents: ["cooperate","compare_adapters"]
 
 tasks:
   - id: "task.echo"
-    description: "Minimal echo"
+    description: "Echo input for handshake test"
     adapter: "echo_v1"
 
 adapters:
   echo_v1:
     type: "echo"
-    params: { prefix: "[MIN]" }
+    params: { prefix: "[AIGYM]" }
