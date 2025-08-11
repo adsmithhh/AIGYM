@@ -1,0 +1,60 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AIGYM Manifest",
+  "type": "object",
+  "required": ["aigym_version", "model", "io"],
+  "properties": {
+    "aigym_version": { "type": "string" },
+    "model": {
+      "type": "object",
+      "required": ["id", "arch"],
+      "properties": {
+        "id": { "type": "string" },
+        "family": { "type": "string" },
+        "arch": { "type": "string" },
+        "dtype": { "type": "string" },
+        "parameters": { "type": ["integer","number"], "minimum": 1 }
+      }
+    },
+    "io": {
+      "type": "object",
+      "properties": {
+        "modalities": { "type": "array", "items": { "type": "string" } },
+        "vocab": { "type": "object", "properties": { "size": { "type": "integer", "minimum": 1 } } }
+      }
+    },
+    "adapters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": { "type": "string" },
+          "rank": { "type": ["integer","null"] },
+          "scope": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "properties": {
+        "tasks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string" },
+              "metric": { "type": "string" },
+              "nominal_score": { "type": ["number","null"] }
+            }
+          }
+        }
+      }
+    },
+    "interop": { "type": "object" },
+    "calibration": { "type": "object" },
+    "security": { "type": "object" }
+  },
+  "additionalProperties": true
+}
