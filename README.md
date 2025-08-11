@@ -14,7 +14,7 @@ AIGYM is an **open handshake & interoperability protocol** for **AI ↔ AI** int
   
 ![CI](https://github.com/adsmithhh/AIGYM/actions/workflows/ci.yml/badge.svg)
 
-### Quick Start
+### Quick Start (macOS/Linux or Git Bash)
 ```bash
 pip install -e .
 pip install pyyaml
