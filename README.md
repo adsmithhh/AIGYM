@@ -33,6 +33,21 @@ python -m pip install -e .
 aigym validate examples/manifest/minimal.yaml
 aigym compare  examples/manifest/minimal.yaml examples/manifest/transformer.yaml
 aigym calibrate --baseline configs/apm/baseline.yaml --left examples/manifest/minimal.yaml --right examples/manifest/transformer.yaml --out runs/calibration.json
-``` 
+```
+### Quick Start (Windows PowerShell)
+```powershell
+git clone https://github.com/adsmithhh/AIGYM.git
+cd AIGYM
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -U pip wheel
+pip install -e .
+pip install pyyaml
+
+aigym validate examples\agent_min.yaml
+aigym demo examples\agent_min.yaml
+aigym calibrate-pair --baseline auto --left examples\manifest\minimal.yaml --right examples\manifest\transformer.yaml
+```
+
 ## License
 MIT — see [LICENSE](LICENSE).
