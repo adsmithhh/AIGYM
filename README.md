@@ -4,6 +4,9 @@
 
 AIGYM is an **open handshake & interoperability protocol** for **AI ↔ AI** interaction.
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+
 - **Manifest** (YAML/JSON): who I am, how I work, what I need.
 - **Validation CLI**: check structure/semantics.
 - **Comparison**: tasks/adapters overlap.
@@ -22,3 +25,5 @@ aigym validate examples/manifest/minimal.yaml
 aigym compare  examples/manifest/minimal.yaml examples/manifest/transformer.yaml
 aigym calibrate --baseline configs/apm/baseline.yaml --left examples/manifest/minimal.yaml --right examples/manifest/transformer.yaml --out runs/calibration.json
 ``` 
+## License
+MIT — see [LICENSE](LICENSE).

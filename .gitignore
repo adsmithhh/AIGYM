@@ -6,3 +6,4 @@ __pycache__/
 # outputs
 runs/
 aigym.db
+src/aigym.egg-info/
