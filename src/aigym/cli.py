@@ -24,7 +24,9 @@ def cmd_demo(args: argparse.Namespace) -> int:
     return 0
 
 def cmd_validate(args: argparse.Namespace) -> int:
-    # Placeholder: schema can be added later.
+    import json
+    from importlib import resources
+    from jsonschema import Draft202012Validator
     p = pathlib.Path(args.manifest)
     if not p.exists():
         print(f"[validate] file not found: {p}", file=sys.stderr)
@@ -32,13 +34,22 @@ def cmd_validate(args: argparse.Namespace) -> int:
     if yaml is None:
         print("[validate] PyYAML not installed: pip install pyyaml", file=sys.stderr)
         return 2
-    try:
-        yaml.safe_load(p.read_text(encoding="utf-8"))
-        print("[validate] OK")
-        return 0
-    except Exception as e:
-        print(f"[validate] ERROR: {e}", file=sys.stderr)
+
+    data = yaml.safe_load(p.read_text(encoding="utf-8"))
+    schema_text = resources.files("aigym").joinpath("schema/manifest.schema.json").read_text(encoding="utf-8")
+    schema = json.loads(schema_text)
+
+    v = Draft202012Validator(schema)
+    errs = sorted(v.iter_errors(data), key=lambda e: (list(e.path), e.message))
+    if errs:
+        for e in errs:
+            loc = "/" + "/".join(map(str, e.path)) if e.path else "<root>"
+            print(f"[validate] {loc}: {e.message}", file=sys.stderr)
         return 1
+
+    print("[validate] OK")
+    return 0
+
 
 def cmd_calibrate_pair(args: argparse.Namespace) -> int:
     # Stub so help works; wire real logic later.
