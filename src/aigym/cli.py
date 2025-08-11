@@ -1,78 +1,77 @@
+# src/aigym/cli.py
+from __future__ import annotations
+import argparse, sys, pathlib, json
+try:
+    import yaml  # type: ignore
+except Exception:
+    yaml = None
 
-﻿import json, sys, argparse, glob
-from .validate import validate_manifest
-from .compare import compare_manifests
-from .calibrate import calibrate_pair
-from . import db as dbmod
+ROOT = pathlib.Path(__file__).resolve().parents[2]  # repo root if editable install
 
-def main():
-    p = argparse.ArgumentParser("aigym")
+def cmd_demo(args: argparse.Namespace) -> int:
+    path = pathlib.Path(args.manifest)
+    if not path.exists():
+        print(f"[demo] manifest not found: {path}", file=sys.stderr)
+        return 2
+    if yaml is None:
+        print("[demo] PyYAML not installed: pip install pyyaml", file=sys.stderr)
+        return 2
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    agent = data.get("agent", {}).get("name", "unknown")
+    intents = data.get("agent", {}).get("handshake", {}).get("intents", [])
+    tasks = [t.get("id") for t in data.get("tasks", [])]
+    print(json.dumps({"agent": agent, "intents": intents, "tasks": tasks}, indent=2))
+    return 0
+
+def cmd_validate(args: argparse.Namespace) -> int:
+    # Placeholder: schema can be added later.
+    p = pathlib.Path(args.manifest)
+    if not p.exists():
+        print(f"[validate] file not found: {p}", file=sys.stderr)
+        return 2
+    if yaml is None:
+        print("[validate] PyYAML not installed: pip install pyyaml", file=sys.stderr)
+        return 2
+    try:
+        yaml.safe_load(p.read_text(encoding="utf-8"))
+        print("[validate] OK")
+        return 0
+    except Exception as e:
+        print(f"[validate] ERROR: {e}", file=sys.stderr)
+        return 1
+
+def cmd_calibrate_pair(args: argparse.Namespace) -> int:
+    # Stub so help works; wire real logic later.
+    print("[calibrate-pair] baseline:", args.baseline)
+    print("[calibrate-pair] left    :", args.left)
+    print("[calibrate-pair] right   :", args.right)
+    print("[calibrate-pair] (stub) compute priorities here")
+    return 0
+
+def build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(prog="aigym", description="AIGYM CLI")
     sub = p.add_subparsers(dest="cmd", required=True)
 
-    v = sub.add_parser("validate", help="Validate a manifest file")
-    v.add_argument("manifest")
-    v.add_argument("--strict", action="store_true")
+    d = sub.add_parser("demo", help="Load a manifest and print summary")
+    d.add_argument("manifest", help="Path to YAML manifest")
+    d.set_defaults(func=cmd_demo)
 
-    c = sub.add_parser("compare", help="Compare two manifests")
-    c.add_argument("left")
-    c.add_argument("right")
-    c.add_argument("--report", default=None)
+    v = sub.add_parser("validate", help="YAML structure smoke-check")
+    v.add_argument("manifest", help="Path to YAML manifest")
+    v.set_defaults(func=cmd_validate)
 
-    a = sub.add_parser("calibrate", help="Calibrate priority between two manifests")
-    a.add_argument("--baseline", required=True)
-    a.add_argument("--left", required=True)
-    a.add_argument("--right", required=True)
-    a.add_argument("--out", default=None)
-    a.add_argument("--sqlite", default=None, help="optional path to sqlite DB to store the calibration report")
+    c = sub.add_parser("calibrate-pair", help="APM anti-saturation calibration (stub)")
+    c.add_argument("--baseline", required=False, default="auto")
+    c.add_argument("--left", required=True)
+    c.add_argument("--right", required=True)
+    c.set_defaults(func=cmd_calibrate_pair)
 
-    g = sub.add_parser("ingest", help="Ingest manifest(s) into sqlite")
-    g.add_argument("--sqlite", required=True)
-    g.add_argument("manifests", nargs="+", help="manifest files or globs (e.g., examples/manifest/*.yaml)")
+    return p
 
-    s = sub.add_parser("dbshow", help="Show recent rows from sqlite")
-    s.add_argument("--sqlite", required=True)
-    s.add_argument("--limit", type=int, default=10)
+def main(argv: list[str] | None = None) -> int:
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    return args.func(args)
 
-    args = p.parse_args()
-
-    if args.cmd == "validate":
-        ok, report = validate_manifest(args.manifest, strict=args.strict)
-        print(json.dumps(report, indent=2))
-        sys.exit(0 if ok else 2)
-
-    if args.cmd == "compare":
-        report = compare_manifests(args.left, args.right)
-        if args.report:
-            with open(args.report, "w", encoding="utf-8") as f:
-                json.dump(report, f, indent=2)
-        print(json.dumps(report, indent=2))
-        return
-
-    if args.cmd == "calibrate":
-    report = calibrate_pair(args.baseline, args.left, args.right)
-        if args.out:
-            from pathlib import Path
-            Path(args.out).parent.mkdir(parents=True, exist_ok=True)
-            with open(args.out, "w", encoding="utf-8") as f:
-                json.dump(report, f, indent=2)
-        print(json.dumps(report, indent=2))
-        if args.sqlite:
-            dbmod.insert_calibration_report(args.sqlite, report)
-        return
-
-    if args.cmd == "ingest":
-        paths = []
-        for pat in args.manifests:
-            paths.extend(glob.glob(pat))
-        if not paths:
-            print("No manifests matched.", file=sys.stderr)
-            sys.exit(2)
-        for mf in paths:
-            dbmod.insert_manifest(args.sqlite, mf)
-        print(f"Ingested {len(paths)} manifest(s) into {args.sqlite}.")
-        return
-
-    if args.cmd == "dbshow":
-        summary = dbmod.recent_summary(args.sqlite, limit=args.limit)
-        print(json.dumps(summary, indent=2))
-        return
+if __name__ == "__main__":
+    raise SystemExit(main())
