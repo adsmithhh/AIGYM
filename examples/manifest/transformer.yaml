@@ -1,0 +1,25 @@
+﻿aigym_version: "0.1.0"
+model:
+  id: example/transformer-decoder
+  family: demo
+  arch: decoder
+  dtype: float16
+  parameters: 220_000_000
+io:
+  modalities: [text]
+  vocab: { size: 32000 }
+adapters:
+  - type: LoRA
+    scope: [attention.k, attention.q, attention.v]
+    rank: 16
+capabilities:
+  tasks:
+    - name: classification
+      metric: accuracy
+      nominal_score: 0.78
+    - name: generation
+      metric: bleu
+      nominal_score: 0.25
+interop:
+  weights:
+    exposure: summary
