@@ -1,60 +1,54 @@
-﻿{
+{
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "AIGYM Manifest",
+  "$id": "aigym://schema/manifest",
   "type": "object",
-  "required": ["aigym_version", "model", "io"],
+  "required": ["agent"],
   "properties": {
-    "aigym_version": { "type": "string" },
-    "model": {
+    "agent": {
       "type": "object",
-      "required": ["id", "arch"],
+      "required": ["id","name","handshake"],
       "properties": {
-        "id": { "type": "string" },
-        "family": { "type": "string" },
-        "arch": { "type": "string" },
-        "dtype": { "type": "string" },
-        "parameters": { "type": ["integer","number"], "minimum": 1 }
-      }
+        "id": {"type": "string", "minLength": 1},
+        "name": {"type": "string", "minLength": 1},
+        "capabilities": {"type": "array", "items": {"type": "string"}},
+        "needs": {"type": "object"},
+        "handshake": {
+          "type": "object",
+          "required": ["protocol","intents"],
+          "properties": {
+            "protocol": {"type": "string"},
+            "intents": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
     },
-    "io": {
-      "type": "object",
-      "properties": {
-        "modalities": { "type": "array", "items": { "type": "string" } },
-        "vocab": { "type": "object", "properties": { "size": { "type": "integer", "minimum": 1 } } }
-      }
-    },
-    "adapters": {
+    "tasks": {
       "type": "array",
       "items": {
         "type": "object",
+        "required": ["id","adapter"],
+        "properties": {
+          "id": {"type": "string"},
+          "description": {"type": "string"},
+          "adapter": {"type": "string"}
+        },
+        "additionalProperties": true
+      }
+    },
+    "adapters": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
         "required": ["type"],
         "properties": {
-          "type": { "type": "string" },
-          "rank": { "type": ["integer","null"] },
-          "scope": { "type": "array", "items": { "type": "string" } }
-        }
+          "type": {"type": "string"},
+          "params": {"type": "object"}
+        },
+        "additionalProperties": true
       }
-    },
-    "capabilities": {
-      "type": "object",
-      "properties": {
-        "tasks": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": ["name"],
-            "properties": {
-              "name": { "type": "string" },
-              "metric": { "type": "string" },
-              "nominal_score": { "type": ["number","null"] }
-            }
-          }
-        }
-      }
-    },
-    "interop": { "type": "object" },
-    "calibration": { "type": "object" },
-    "security": { "type": "object" }
+    }
   },
   "additionalProperties": true
 }
